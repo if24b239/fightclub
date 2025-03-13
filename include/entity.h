@@ -21,7 +21,9 @@ class Entity {
 
     //setter
     bool damage() { return (--healthPoints <= 0) ? true : false; }
+    void heal() { healthPoints++; }
     void fightWon() { wins++; }
     void fightLost() { losses++; }
-    void removeStamina(int loss) { stamina = loss; }
+    void removeStamina(int loss) { stamina -= loss; }
+    void addStamina(int gain) { stamina += gain; }
 };

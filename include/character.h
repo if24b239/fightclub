@@ -1,8 +1,9 @@
 #pragma once
 
 #include <entity.h>
-#include <basicAbility.h>
 #include <functional>
+
+class BasicAbility;
 
 enum direction {
     NONE = 0,
@@ -11,24 +12,29 @@ enum direction {
     DOWN
 };
 
-class Character : Entity {
+class Character : public Entity {
     private:
     BasicAbility* firstAbility;
     BasicAbility* secondAbility;
 
     direction defendPosition;
 
-    std::function<void(Character&)> f_hit = nullptr;
-    std::function<void(Character&)> f_got_hit = nullptr;
-    std::function<void(Character&)> f_blocked = nullptr;
-    std::function<void(Character&)> f_got_blocked = nullptr;
+    bool stunned;
 
     public:
     Character(BasicAbility* first, BasicAbility* second);
+    ~Character();
 
-    void attack(Character& target, direction dir);
+    std::function<void(Character*, Character*)> f_hit = nullptr;
+    std::function<void(Character*, Character*)> f_got_hit = nullptr;
+    std::function<void(Character*, Character*)> f_blocked = nullptr;
+    std::function<void(Character*, Character*)> f_got_blocked = nullptr;
+
+    // returns true if fight is won
+    bool attack(Character* target, direction dir);
+
     void defend(direction dir) { defendPosition = dir; };
-    void runAbility(Character* target, std::function<void(Character&)> fp_) { if (fp_ != nullptr) { fp_(*target); } }
+    void runAbility(Character* target, Character* self, std::function<void(Character*, Character*)> fp_) { if (fp_ != nullptr) { fp_(target, self); } }
 };
 
 

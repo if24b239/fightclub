@@ -1,17 +1,18 @@
 #include <character.h>
+#include <basicAbility.h>
 
 Character::Character(BasicAbility* first, BasicAbility* second): firstAbility(first), secondAbility(second), defendPosition(MIDDLE) {
 
     // get first ability lambda
-    std::function<void(Character&)> first_lambda = [this, first](Character& target) {
+    std::function<void(Character*, Character*)> first_lambda = [this, first](Character* target, Character* self) {
         // use ability and update stamina
-        removeStamina(first->use(target));
+        removeStamina(first->use(target, this));
     };
 
     // get second ability lambda
-    std::function<void(Character&)> second_lambda = [this, second](Character& target) {
+    std::function<void(Character*, Character*)> second_lambda = [this, second](Character* target, Character* self) {
         // use ability and update stamina
-        removeStamina(second->use(target));
+        removeStamina(second->use(target, this));
     };
 
     switch (first->getUsedWhen()) {
@@ -43,17 +44,36 @@ Character::Character(BasicAbility* first, BasicAbility* second): firstAbility(fi
             f_got_blocked = second_lambda;
             break;
     }
-};
+}
+
+Character::~Character() {
+    delete firstAbility;
+    delete secondAbility;
+}
 
 
-void Character::attack(Character& target, direction dir) {
+bool Character::attack(Character* target, direction dir) {
 
-    if (dir == target.defendPosition) {
-        target.runAbility(this, f_blocked);
-        runAbility(&target, f_got_blocked);
-    } else {
-        target.runAbility(this, f_got_hit);
-        runAbility(&target, f_hit);
+    // dont run if stunned
+    if (stunned) {
+        stunned = false;
+        return false;
     }
+
+    // call functions depending on what happened
+    if (dir == target->defendPosition) {
+        target->runAbility(this, target, target->f_blocked);
+        runAbility(target, this, f_got_blocked);
+    } else {
+        target->runAbility(this, target, target->f_got_hit);
+        runAbility(target, this, f_hit);
+
+        if (target->damage()) {
+            target->fightLost();
+            fightWon();
+            return true;
+        };
+    }
+    return false;
 
 }

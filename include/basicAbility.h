@@ -1,9 +1,10 @@
 #pragma once
 
 #include <string>
-#include "character.h"
+#include <random>
+#include <character.h>
 
-#include <iostream>
+class Character;
 
 enum usedOn {
     HIT,
@@ -15,27 +16,26 @@ enum usedOn {
 class BasicAbility {
     private:
     std::string name;
-    int staminaCost;
     usedOn usedWhen;
     
     protected:
-    virtual void effect(Character& target) {};
+    int staminaCost;
+    virtual void effect(Character* target, Character* self) {};
 
     public:
-    
-    BasicAbility(std::string name, int cost, usedOn usedWhen): name(name), staminaCost(cost), usedWhen(usedWhen) {}
+    BasicAbility(std::string name, int cost, usedOn usedWhen): name(name), usedWhen(usedWhen), staminaCost(cost) {}
     virtual ~BasicAbility() {};
 
     // runs the effect function and returns staminaCost
-    int use(Character& target) { effect(target); return staminaCost; }
+    int use(Character* target, Character* self) { effect(target, self); return staminaCost; }
 
     usedOn getUsedWhen() { return usedWhen; }
 
-};
+} typedef BasicAbility;
 
 class Counter : public BasicAbility {
 
-    void effect(Character& target);
+    void effect(Character* target, Character* self);
 
     public:
     Counter(): BasicAbility("Counter", 1, BLOCKED) {}
@@ -43,7 +43,7 @@ class Counter : public BasicAbility {
 
 class Heal : public BasicAbility {
 
-    void effect(Character& target);
+    void effect(Character* target, Character* self);
 
     public:
     Heal(): BasicAbility("Heal", 4, GOT_HIT) {}
@@ -51,7 +51,7 @@ class Heal : public BasicAbility {
 
 class Combo : public BasicAbility {
 
-    void effect(Character& target);
+    void effect(Character* target, Character* self);
 
     public:
     Combo(): BasicAbility("Combo", 2, HIT) {}
@@ -59,7 +59,7 @@ class Combo : public BasicAbility {
 
 class Stun : public BasicAbility {
 
-    void effect(Character& target);
+    void effect(Character* target, Character* self);
 
     public:
     Stun(): BasicAbility("Stun", 2, GOT_BLOCKED) {}
