@@ -32,8 +32,8 @@ class Character : public Entity {
 
     // returns true if fight is won
     bool attack(Character* target, direction dir);
-
-    void defend(direction dir) { defendPosition = dir; };
+    void defend(direction dir) { defendPosition = dir; }
+    void stun() { stunned = true; }
     void runAbility(Character* target, Character* self, std::function<void(Character*, Character*)> fp_) { if (fp_ != nullptr) { fp_(target, self); } }
 };
 

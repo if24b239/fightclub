@@ -1,7 +1,7 @@
 #include <character.h>
 #include <basicAbility.h>
 
-Character::Character(BasicAbility* first, BasicAbility* second): firstAbility(first), secondAbility(second), defendPosition(MIDDLE) {
+Character::Character(BasicAbility* first, BasicAbility* second): firstAbility(first), secondAbility(second), defendPosition(NONE), stunned(false) {
 
     // get first ability lambda
     std::function<void(Character*, Character*)> first_lambda = [this, first](Character* target, Character* self) {
